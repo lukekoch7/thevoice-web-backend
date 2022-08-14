@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 
 const app: express.Application = express();
 
-const allowedOrigins = ['http://localhost:3000'];
+const allowedOrigins = ['https://voice-web.herokuapp.com'];
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins
