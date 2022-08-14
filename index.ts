@@ -7,14 +7,14 @@ import bodyParser from "body-parser";
 
 const app: express.Application = express();
 
-const allowedOrigins = ['https://voice-web.herokuapp.com'];
+const allowedOrigins = ['https://thevoice-web.herokuapp.com'];
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins
 };
 app.use(cors(options));
 app.use(bodyParser.json())
-const port: number = parseInt(process.env.PORT ?? "3001");
+const port: number = parseInt(process.env.PORT ?? "80");
 
 let currentBets: Bet[] = [];
 let currentResults: Results = {
