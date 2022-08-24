@@ -1,13 +1,13 @@
 import express from "express";
 import { Bet } from "./src/shared/Bet";
-import { Results } from "./src/shared/Results";
-import { calcResult } from "./src/gameLogic";
+import { Result, Update } from "./src/shared/Results";
+import { calcResults } from "./src/gameLogic";
 import cors from "cors";
 import bodyParser from "body-parser";
 
 const app: express.Application = express();
 
-const allowedOrigins = ["https://thevoice-web.herokuapp.com"];
+const allowedOrigins = ["https://thevoice-web.herokuapp.com", "http://localhost:3000"];
 
 const randUsernames = [
   "Christian Lindner",
@@ -30,13 +30,12 @@ const options: cors.CorsOptions = {
 };
 app.use(cors(options));
 app.use(bodyParser.json());
-const port: number = parseInt(process.env.PORT ?? "80");
+const port: number = parseInt(process.env.PORT ?? "3001");
 
+let isBlocked = false;
 let currentBets: Bet[] = [];
-let currentResults: Results = {
-  timestamp: Date.now(),
-  results: [],
-};
+let currentResults: Result[];
+let lastUpdateTS: number;
 
 // Handling '/' Request
 app.get("/", (req, res) => {
@@ -49,7 +48,8 @@ app.post("/placeBet", (req, res) => {
     res.sendStatus(400);
   } else {
     if (newBet.player === "admin42") {
-      currentResults = calcResult(currentBets, newBet);
+      currentResults = calcResults(currentBets, newBet);
+      lastUpdateTS = Date.now();
       currentBets = [];
       res.send("Result successfully processed!");
       return;
@@ -61,8 +61,14 @@ app.post("/placeBet", (req, res) => {
   }
 });
 
-app.get("/results", (req, res) => {
-  res.json(currentResults);
+app.get("/updates", (req, res) => {
+  const update: Update = {
+    timestamp: lastUpdateTS,
+    isBlocked: isBlocked,
+    results: currentResults,
+    bets: currentBets
+  }
+  res.json(update);
 });
 
 app.get("/randUsername", (req, res) => {
@@ -73,6 +79,12 @@ app.get("/randUsername", (req, res) => {
   randUsernameIndex++;
   res.send(userName);
 });
+
+app.get("/toggleBlocked", (req, res) => {
+  isBlocked = !isBlocked;
+  console.log("Block state toggled: " + isBlocked)
+  res.send("Block state toggled!")
+})
 
 // Server setup
 app.listen(port, () => {
