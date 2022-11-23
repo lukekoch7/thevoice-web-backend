@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 
 const app: express.Application = express();
 
-const allowedOrigins = ["https://thevoice-web.herokuapp.com", "http://localhost:3000"];
+const allowedOrigins = ["https://thevoice-web.vercel.app/", "http://localhost:3000"];
 
 const randUsernames = [
   "Christian Lindner",
@@ -29,6 +29,7 @@ const options: cors.CorsOptions = {
   origin: allowedOrigins,
 };
 app.use(cors(options));
+// app.use(cors())
 app.use(bodyParser.json());
 const port: number = parseInt(process.env.PORT ?? "3001");
 
